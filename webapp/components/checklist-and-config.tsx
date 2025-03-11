@@ -43,65 +43,64 @@ export default function ChecklistAndConfig({
   const [allChecksPassed, setAllChecksPassed] = useState(false);
   const [webhookLoading, setWebhookLoading] = useState(false);
   const [ngrokLoading, setNgrokLoading] = useState(false);
+  const [refreshLoading, setRefreshLoading] = useState(false);
 
   const appendedTwimlUrl = publicUrl ? `${publicUrl}/twiml` : "";
   const isWebhookMismatch =
     appendedTwimlUrl && currentVoiceUrl && appendedTwimlUrl !== currentVoiceUrl;
 
-  useEffect(() => {
-    let polling = true;
+  // Función para verificar el estado completo del sistema
+  const refreshStatus = async () => {
+    setRefreshLoading(true);
+    try {
+      // 1. Check credentials
+      let res = await fetch("/api/twilio");
+      if (!res.ok) throw new Error("Failed credentials check");
+      const credData = await res.json();
+      setHasCredentials(!!credData?.credentialsSet);
 
-    const pollChecks = async () => {
-      try {
-        // 1. Check credentials
-        let res = await fetch("/api/twilio");
-        if (!res.ok) throw new Error("Failed credentials check");
-        const credData = await res.json();
-        setHasCredentials(!!credData?.credentialsSet);
-
-        // 2. Fetch numbers
-        res = await fetch("/api/twilio/numbers");
-        if (!res.ok) throw new Error("Failed to fetch phone numbers");
-        const numbersData = await res.json();
-        if (Array.isArray(numbersData) && numbersData.length > 0) {
-          setPhoneNumbers(numbersData);
-          // If currentNumberSid not set or not in the list, use first
-          const selected =
-            numbersData.find((p: PhoneNumber) => p.sid === currentNumberSid) ||
-            numbersData[0];
-          setCurrentNumberSid(selected.sid);
-          setCurrentVoiceUrl(selected.voiceUrl || "");
-          setSelectedPhoneNumber(selected.friendlyName || "");
-        }
-
-        // 3. Check local server & public URL
-        let foundPublicUrl = "";
-        try {
-          const resLocal = await fetch("http://localhost:8081/public-url");
-          if (resLocal.ok) {
-            const pubData = await resLocal.json();
-            foundPublicUrl = pubData?.publicUrl || "";
-            setLocalServerUp(true);
-            setPublicUrl(foundPublicUrl);
-          } else {
-            throw new Error("Local server not responding");
-          }
-        } catch {
-          setLocalServerUp(false);
-          setPublicUrl("");
-        }
-      } catch (err) {
-        console.error(err);
+      // 2. Fetch numbers
+      res = await fetch("/api/twilio/numbers");
+      if (!res.ok) throw new Error("Failed to fetch phone numbers");
+      const numbersData = await res.json();
+      if (Array.isArray(numbersData) && numbersData.length > 0) {
+        setPhoneNumbers(numbersData);
+        // If currentNumberSid not set or not in the list, use first
+        const selected =
+          numbersData.find((p: PhoneNumber) => p.sid === currentNumberSid) ||
+          numbersData[0];
+        setCurrentNumberSid(selected.sid);
+        setCurrentVoiceUrl(selected.voiceUrl || "");
+        setSelectedPhoneNumber(selected.friendlyName || "");
       }
-    };
 
-    pollChecks();
-    const intervalId = setInterval(() => polling && pollChecks(), 1000);
-    return () => {
-      polling = false;
-      clearInterval(intervalId);
-    };
-  }, [currentNumberSid, setSelectedPhoneNumber]);
+      // 3. Check local server & public URL
+      let foundPublicUrl = "";
+      try {
+        const resLocal = await fetch("http://localhost:8081/public-url");
+        if (resLocal.ok) {
+          const pubData = await resLocal.json();
+          foundPublicUrl = pubData?.publicUrl || "";
+          setLocalServerUp(true);
+          setPublicUrl(foundPublicUrl);
+          
+          // Check if the public URL is accessible
+          if (foundPublicUrl) {
+            await checkNgrok();
+          }
+        } else {
+          throw new Error("Local server not responding");
+        }
+      } catch {
+        setLocalServerUp(false);
+        setPublicUrl("");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRefreshLoading(false);
+    }
+  };
 
   const updateWebhook = async () => {
     if (!currentNumberSid || !appendedTwimlUrl) return;
@@ -128,7 +127,7 @@ export default function ChecklistAndConfig({
     if (!localServerUp || !publicUrl) return;
     setNgrokLoading(true);
     let success = false;
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
       try {
         const resTest = await fetch(publicUrl + "/public-url");
         if (resTest.ok) {
@@ -139,7 +138,7 @@ export default function ChecklistAndConfig({
       } catch {
         // retry
       }
-      if (i < 4) {
+      if (i < 2) {
         await new Promise((r) => setTimeout(r, 3000));
       }
     }
@@ -299,6 +298,11 @@ export default function ChecklistAndConfig({
     }
   }, [allChecksPassed, setReady]);
 
+  // Efectuar una verificación inicial cuando el componente se monta
+  useEffect(() => {
+    refreshStatus();
+  }, []);
+
   const handleDone = () => setReady(true);
 
   return (
@@ -337,7 +341,21 @@ export default function ChecklistAndConfig({
           ))}
         </div>
 
-        <div className="mt-6 flex flex-col sm:flex-row sm:justify-end">
+        <div className="mt-6 flex flex-col sm:flex-row sm:justify-between">
+          <Button 
+            variant="secondary" 
+            onClick={refreshStatus}
+            disabled={refreshLoading}
+          >
+            {refreshLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 animate-spin" />
+                Refreshing...
+              </>
+            ) : (
+              "Refresh Status"
+            )}
+          </Button>
           <Button
             variant="outline"
             onClick={handleDone}

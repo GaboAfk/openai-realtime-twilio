@@ -2,7 +2,6 @@
 
 Combine OpenAI's Realtime API and Twilio's phone calling capability to build an AI calling assistant.
 
-<img width="1728" alt="Screenshot 2024-12-18 at 4 59 30 PM" src="https://github.com/user-attachments/assets/d3c8dcce-b339-410c-85ca-864a8e0fc326" />
 
 ## Quick Setup
 
@@ -103,7 +102,3 @@ Make note of the `Forwarding` URL. (e.g. `https://54c5-35-170-32-42.ngrok-free.a
 ### Websocket URL
 
 Your server should now be accessible at the `Forwarding` URL when run, so set the `PUBLIC_URL` in `websocket-server/.env`. See `websocket-server/.env.example` for reference.
-
-# Additional Notes
-
-This repo isn't polished, and the security practices leave some to be desired. Please only use this as reference, and make sure to audit your app with security and engineering before deploying!

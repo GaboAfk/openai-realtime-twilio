@@ -49,7 +49,6 @@ export default function ChecklistAndConfig({
   const isWebhookMismatch =
     appendedTwimlUrl && currentVoiceUrl && appendedTwimlUrl !== currentVoiceUrl;
 
-  // Función para verificar el estado completo del sistema
   const refreshStatus = async () => {
     setRefreshLoading(true);
     try {
@@ -83,8 +82,7 @@ export default function ChecklistAndConfig({
           foundPublicUrl = pubData?.publicUrl || "";
           setLocalServerUp(true);
           setPublicUrl(foundPublicUrl);
-          
-          // Check if the public URL is accessible
+
           if (foundPublicUrl) {
             await checkNgrok();
           }
@@ -298,7 +296,6 @@ export default function ChecklistAndConfig({
     }
   }, [allChecksPassed, setReady]);
 
-  // Efectuar una verificación inicial cuando el componente se monta
   useEffect(() => {
     refreshStatus();
   }, []);

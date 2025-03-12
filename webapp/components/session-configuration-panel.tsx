@@ -15,6 +15,8 @@ import { toolTemplates } from "@/lib/tool-templates";
 import { ToolConfigurationDialog } from "./tool-configuration-dialog";
 import { BackendTag } from "./backend-tag";
 import { useBackendTools } from "@/lib/use-backend-tools";
+import { conf_instructions } from '../app/conversation_config.js';
+
 
 interface SessionConfigurationPanelProps {
   callStatus: string;
@@ -25,9 +27,7 @@ const SessionConfigurationPanel: React.FC<SessionConfigurationPanelProps> = ({
   callStatus,
   onSave,
 }) => {
-  const [instructions, setInstructions] = useState(
-    "You are a helpful assistant in a phone call."
-  );
+  const [instructions, setInstructions] = useState(conf_instructions);
   const [voice, setVoice] = useState("ash");
   const [tools, setTools] = useState<string[]>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);

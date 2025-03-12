@@ -1,4 +1,3 @@
-//webapp/components/call-interface.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -82,8 +81,11 @@ const CallInterface = () => {
               setAllConfigsReady={setAllConfigsReady}
             />
             <Transcript items={items} />
-            {/* Reemplaza el botón de llamada por el componente CallButton */}
-            <CallButton />
+            {/* Pasa el número de teléfono seleccionado al botón de llamada */}
+            <CallButton 
+              selectedPhoneNumber={selectedPhoneNumber} 
+              disabled={!allConfigsReady || callStatus !== "connected"} 
+            />
           </div>
 
           {/* Right Column: Function Calls */}

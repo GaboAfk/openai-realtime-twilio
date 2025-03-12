@@ -115,6 +115,12 @@ function handleFrontendMessage(data: RawData) {
   }
 }
 
+// const model = 'gpt-4o-mini-realtime-preview-2024-12-17';
+// console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+// console.log('model')
+// console.log(model)
+// console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+
 function tryConnectModel() {
   if (!session.twilioConn || !session.streamSid || !session.openAIApiKey)
     return;

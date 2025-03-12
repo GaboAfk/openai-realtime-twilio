@@ -20,6 +20,6 @@ export async function POST(req: Request) {
 
     return Response.json({ message: "Call initiated", callSid: call.sid });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error }, { status: 500 });
   }
 }

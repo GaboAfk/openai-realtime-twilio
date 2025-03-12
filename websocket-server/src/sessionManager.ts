@@ -1,5 +1,6 @@
 import { RawData, WebSocket } from "ws";
 import functions from "./functionHandlers";
+import { conf_instructions } from "./conversation_config";
 
 interface Session {
   twilioConn?: WebSocket;
@@ -11,14 +12,16 @@ interface Session {
   responseStartTimestamp?: number;
   latestMediaTimestamp?: number;
   openAIApiKey?: string;
+  openAImodel?: string;
 }
 
 let session: Session = {};
 
-export function handleCallConnection(ws: WebSocket, openAIApiKey: string) {
+export function handleCallConnection(ws: WebSocket, openAIApiKey: string, openAImodel: string) {
   cleanupConnection(session.twilioConn);
   session.twilioConn = ws;
   session.openAIApiKey = openAIApiKey;
+  session.openAImodel = openAImodel;
 
   ws.on("message", handleTwilioMessage);
   ws.on("error", ws.close);
@@ -115,19 +118,13 @@ function handleFrontendMessage(data: RawData) {
   }
 }
 
-// const model = 'gpt-4o-mini-realtime-preview-2024-12-17';
-// console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-// console.log('model')
-// console.log(model)
-// console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-
 function tryConnectModel() {
   if (!session.twilioConn || !session.streamSid || !session.openAIApiKey)
     return;
   if (isOpen(session.modelConn)) return;
 
   session.modelConn = new WebSocket(
-    "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17",
+    `wss://api.openai.com/v1/realtime?model=${session.openAImodel}`,
     {
       headers: {
         Authorization: `Bearer ${session.openAIApiKey}`,
@@ -142,6 +139,7 @@ function tryConnectModel() {
       type: "session.update",
       session: {
         modalities: ["text", "audio"],
+        instructions: conf_instructions || "You are a helpful assistant.",
         turn_detection: { type: "server_vad" },
         voice: "ash",
         input_audio_transcription: { model: "whisper-1" },

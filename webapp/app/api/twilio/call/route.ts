@@ -1,4 +1,3 @@
-//webapp/app/api/twilio/call/route.ts
 import twilioClient from "@/lib/twilio";
 
 export async function POST(req: Request) {
@@ -10,12 +9,12 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { to, from, url } = await req.json(); // Número destino, número de Twilio, URL con instrucciones TwiML
+    const { to, from, url } = await req.json();
 
     const call = await twilioClient.calls.create({
-      to, // Número al que llamas
-      from, // Tu número de Twilio
-      url, // URL con TwiML (instrucciones para la llamada)
+      to,
+      from,
+      url,
     });
 
     return Response.json({ message: "Call initiated", callSid: call.sid });

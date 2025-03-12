@@ -1,4 +1,3 @@
-//webapp/app/api/twilio/call/[callSid]/route.ts
 import twilioClient from "@/lib/twilio";
 
 export async function DELETE(
@@ -15,13 +14,12 @@ export async function DELETE(
   const { callSid } = params;
 
   try {
-    // Actualizar la llamada a status completed (colgarla)
     const call = await twilioClient
       .calls(callSid)
       .update({ status: "completed" });
 
     return Response.json({ message: "Call ended successfully", callSid: call.sid });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error }, { status: 500 });
   }
 }

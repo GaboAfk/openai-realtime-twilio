@@ -91,7 +91,7 @@ const CallButton: React.FC<CallButtonProps> = ({
           className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md flex items-center"
         >
           <PhoneCall className="mr-2" size={18} />
-          {isLoading ? 'Iniciando llamada...' : 'Realizar llamada'}
+          {isLoading ? 'Initiating call...' : 'Make call'}
         </Button>
       ) : (
         <Button 
@@ -100,7 +100,7 @@ const CallButton: React.FC<CallButtonProps> = ({
           className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md flex items-center"
         >
           <PhoneOff className="mr-2" size={18} />
-          {isLoading ? 'Finalizando...' : 'Colgar llamada'}
+          {isLoading ? 'Finishing...' : 'Hang up call'}
         </Button>
       )}
     </div>

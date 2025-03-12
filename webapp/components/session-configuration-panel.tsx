@@ -181,7 +181,7 @@ const SessionConfigurationPanel: React.FC<SessionConfigurationPanelProps> = ({
               </label>
               <Textarea
                 placeholder="Enter instructions"
-                className="min-h-[100px] resize-none"
+                className="min-h-[300px] resize-none"
                 value={instructions}
                 onChange={(e) => setInstructions(e.target.value)}
               />

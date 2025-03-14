@@ -64,6 +64,10 @@ This demo mocks out function calls so you can provide sample responses. In reali
 ## Full Setup
 
 1. Make sure your [auth & env](#detailed-auth--env) is configured correctly.
+```shell
+cp websocket-server/.env.example websocket-server/.env
+cp webapp/.env.example webapp/.env
+```
 
 2. Run webapp.
 
